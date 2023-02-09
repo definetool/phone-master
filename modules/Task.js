@@ -139,6 +139,8 @@ class Task {
             if (typeof value == 'object') {
                 return $String.format(sample, value);
             }
+
+            throw new Error('无法识别的返回值：dest');
         });
 
     }

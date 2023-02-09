@@ -1,10 +1,13 @@
 
 const File = require('@definejs/file');
+const Path = require('@definejs/path');
 
 module.exports = {
     
     copy({ file, dest, overwrite, link, }) {
         let msgs = [];
+
+        dest = Path.normalize(dest);
 
         if (File.exists(dest)) {
             if (overwrite) {

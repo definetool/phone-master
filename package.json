@@ -1,0 +1,32 @@
+{
+  "name": "@definetool/phone-master",
+  "version": "1.0.0",
+  "description": "手机照片分类工具。",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "micty",
+  "email": "mictydeng@qq.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/definetool/phone-master.git"
+  },
+  "dependencies": {
+    "@definejs/array": "^1.1.0",
+    "@definejs/date": "^1.1.0",
+    "@definejs/directory": "^2.0.3",
+    "@definejs/emitter": "^1.1.0",
+    "@definejs/file": "^2.0.1",
+    "@definejs/md5": "^2.0.0",
+    "@definejs/path": "^2.0.1",
+    "@definejs/patterns": "^1.0.2",
+    "@definejs/string": "^1.0.0",
+    "@definejs/tasker": "^1.0.2",
+    "@definejs/timer": "^1.0.1",
+    "@webpart/console": "^2.1.0",
+    "colors": "^1.4.0",
+    "exif": "^0.6.0",
+    "progress": "^2.0.3"
+  }
+}

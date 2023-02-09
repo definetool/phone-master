@@ -1,4 +1,4 @@
-# @definetool/photo-master
+# @definetool/phone-master
 
 手机照片分类工具。
 
@@ -7,7 +7,7 @@
 #### 使用默认设置
 ``` js
 
-const { process, } = require('@definetool/photo-master');
+const { process, } = require('@definetool/phone-master');
 
 process({
     source: '/Volumes/3/照片与视频/iPhone/Exports/2023-01-30@0949.src/',
@@ -20,7 +20,7 @@ process({
 #### 自定义方式
 ``` js
 
-const { Task, } = require('@definetool/photo-master');
+const { Task, } = require('@definetool/phone-master');
 
 let task = new Task({
     source: '/Volumes/3/照片与视频/iPhone/Exports/2023-01-30@0949.src/',

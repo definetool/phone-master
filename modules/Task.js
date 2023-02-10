@@ -52,12 +52,15 @@ class Task {
 
         let meta = Meta.create(config);
         let console = Console.create(meta.output.console);
-        let timer = new Timer(console);
         let emitter = new Emitter(this);
 
-        Object.assign(meta, { console, timer, emitter, });
+        this.console = console;
+        meta.console = console;
+        meta.emitter = emitter;
+
         mapper.set(this, meta);
     }
+
 
     on(...args) { 
         let meta = mapper.get(this);
@@ -70,7 +73,8 @@ class Task {
     */
     parse() {
         let meta = mapper.get(this);
-        let { console, timer, source, target, } = meta;
+        let { console, source, target, } = meta;
+        let timer = new Timer(console);
 
         timer.start(`开始分析 >>`.bold);
 
@@ -104,6 +108,14 @@ class Task {
 
     }
 
+    clear() { 
+        let meta = mapper.get(this);
+        let { console, target, } = meta;
+        let { dir, } = target;
+
+        console.log(`清空目录:`.bgYellow, dir.red);
+        Directory.clear(dir);
+    }
 
     copy() {
         let meta = mapper.get(this);
@@ -111,8 +123,7 @@ class Task {
         let { tasks, } = info;
 
         if (target.clear) {
-            console.log(`清空目录:`.bgYellow, target.dir.red);
-            Directory.clear(target.dir);
+            this.clear();
         }
 
 

@@ -3,20 +3,50 @@ const Path = require('@definejs/path');
 
 
 module.exports = {
-    create(config) { 
+    create(config, defaults) { 
+        //重载 create(dir, defaults);
+        if (typeof config == 'string') {
+            let dir = config;
+
+            config = {
+                output: `${dir}/output/`,
+                source: `${dir}/source/`,
+                target: `${dir}/target/`,
+            };
+        }
+        
+       
         let { output, source, target, } = config;
 
-        source.dir = Path.normalizeDir(source.dir);
-
-
-        if (target.dir) {
-            target.dir = Path.normalizeDir(target.dir);
+        if (typeof output == 'string') {
+            output = { 'dir': output, };
         }
+
+        if (typeof source == 'string') {
+            source = { 'dir': source, };
+        }
+
+        if (typeof target == 'string') {
+            target = { 'dir': target, };
+        }
+
+
+        output = { ...defaults.output, ...output, };
+        source = { ...defaults.source, ...source, };
+        target = { ...defaults.target, ...target, };
+
+        config = { ...defaults, ...config, output, source, target, };
 
         if (output.dir) {
             output.dir = Path.normalizeDir(output.dir);
             output.console = Path.normalize(`${output.dir}${output.console}`);
             output.info = Path.normalize(`${output.dir}${output.info}`);
+        }
+
+        source.dir = Path.normalizeDir(source.dir);
+
+        if (target.dir) {
+            target.dir = Path.normalizeDir(target.dir);
         }
         
 

@@ -25,32 +25,33 @@ class Task {
     /**
     * 构造器。
     * @param {*} config 配置对象。
+    * 已重载 Task(dir);
+    * 已重载 Task(config);
+    * 
     *   config = {
-    *       home: '',       //会话过程中产生的日志等临时文件的存放目录。 建议每次都使用一个不同的目录，以方便多次运行后进行查找。
-    *       console: '',    //会话过程中产生的日志的文件名称。 如果指定，则写入此文件；否则仅在控制台输出。
-    *       cache: '',      //解析 source 目录和 target 目录中的文件 MD5 时要保存的元数据信息的目录名，建议指定为 `.sync-files/`。
-    *       source: '',     //要同步的源目录。
-    *       target: '',     //要同步的目标目录。
-    *       patterns: [],   //要同步的文件列表模式。 如果不指定，或指定为空数组，则表示全部文件。
+    *       output: {
+    *           dir: '',
+    *           console: 'console.log',
+    *           info: 'info.json',
+    *       },
+    *       
+    *       source: {
+    *           dir: '',
+    *           patterns: [],
+    *           excludes: [],
+    *           exifs: [],
+    *       },
+    * 
+    *       target: {
+    *           dir: '',
+    *           clear: false,
+    *           overwrite: false,
+    *           
+    *       },
     *   };
     */
     constructor(config) {
-        let { defaults, } = exports;
-        let { source, target, } = config;
-
-        if (typeof source == 'string') {
-            source = { 'dir': source, };
-        }
-
-        if (typeof target == 'string') {
-            target = { 'dir': target, };
-        }
-
-        source = { ...defaults.source, ...source, };
-        target = { ...defaults.target, ...target, };
-        config = { ...defaults, ...config, source, target, };
-
-        let meta = Meta.create(config);
+        let meta = Meta.create(config, exports.defaults);
         let console = Console.create(meta.output.console);
         let emitter = new Emitter(this);
 

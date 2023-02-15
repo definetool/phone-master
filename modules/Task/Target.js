@@ -19,6 +19,8 @@ module.exports = {
         
 
         let list = files.map((file) => {
+            //当 file == main 时则为主文件，否则为重复文件。
+
             let md5 = file$md5[file];
             let main = md5$main[md5];
             let exif = file$exif[file];
@@ -26,7 +28,7 @@ module.exports = {
             let { dest, sample, date, year, month, day, ext, type, name, basename, } = Dest.get({ dir, file, exif, samples, });
 
             return {
-                dir, overwrite, file, md5, exif,
+                dir, overwrite, file, md5, main, exif,
                 dest, sample, date, year, month, day, ext, type, name, basename, 
             };
 
@@ -49,7 +51,7 @@ module.exports = {
             let link = index == maxIndex ? `└──` : `├──`;
             let msgs = [];
 
-            dest = process(item);
+            dest = process(item, index);
 
             if (dest) {
                 msgs = File.copy({ file, dest, overwrite, link, });

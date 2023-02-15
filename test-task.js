@@ -2,16 +2,15 @@
 const { Task, Timer, } = require('./index');
 
 
-let task = new Task({
-    source: '/Volumes/3/照片与视频/iPhone/Exports/2023-01-30@0949.src/',
-    target: '/Volumes/3/照片与视频/iPhone/Exports/2023-01-30@0949.dest/',
-});
+let dir = '/Volumes/3/照片与视频/iPhone/Exports/2023-02-14@1719/';
 
+
+
+let task = new Task(dir);
 let timer = new Timer(task.console);
 
 
 timer.start(`开始任务 >>`.bold);
-
 
 task.on('parse', function (info) {
     task.clear();
@@ -22,12 +21,14 @@ task.on('parse', function (info) {
 
 //开始复制到目标目录时触发。
 task.on('process', function (item) {
+
     let {
-        dir, overwrite, file, md5, exif,
+        dir, overwrite, file, md5, main, exif,
         dest, sample, date, year, month, day, ext, type, name, basename,
     } = item;
 
     ext = ext.toLowerCase();
+
 
     //返回 false 可以忽略该文件，即不要复制。
     if (ext == '.ini') {
@@ -50,7 +51,7 @@ task.on('process', function (item) {
     }
 
     //如 `RPReplay_Final1674383698.mp4`
-    if (name.startsWith('RPReplay_Final') && ext == '.mp4') {
+    if (name.startsWith('RPReplay_Final')) {
         return `${dir}/录屏/${date}/${name}`;
     }
 
@@ -75,5 +76,7 @@ task.on('process', function (item) {
     }
 
 });
+
+
 
 task.parse();

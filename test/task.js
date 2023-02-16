@@ -1,43 +1,7 @@
-# @definetool/phone-master
 
-手机照片分类工具。
-
-### 示例
-
-#### 使用默认设置
-
-
-``` js
-
-const { copy, rename, } = require('@definetool/phone-master');
-
-//假设要使用的目录结构为：
-//  source = `${dir}/source/`;
-//  target = `${dir}/target/`;
-//  output = `${dir}/output/`;
-//则可只提供父级的目录，即 dir 目录。
-let dir = `/Volumes/3/照片与视频/iPhone/Exports/2023-02-14@1719/`;
-
-//使用复制的方式。
-//source 目录的文件会被以复制的方式分类到 target 目录，
-//同时输出的中间信息、日志到 output 目录。
-copy(dir);
-
-//使用移动的方式(速度更快，但会修改 source 目录)。
-//source 目录的文件会被以移动的方式分类到 target 目录，
-//同时输出的中间信息、日志到 output 目录。
-rename(dir);
-
-```
-
-#### 自定义方式
-
-更多的自定义方式的使用例子请见 test 目录。
-
-``` js
 const fs = require('fs');
 const File = require('@definejs/file');
-const { Task, Timer, } = require('@definetool/phone-master');
+const { Task, Timer, } = require('../index');
 
 
 let dir = '/Volumes/3/照片与视频/iPhone/Exports/2023-02-14@1719/';
@@ -49,7 +13,7 @@ let config = {
     },
 
     source: {
-        dir: `${dir}source`,
+        dir: `${dir}/source/`,
         patterns: [
             '**/*',
         ],
@@ -176,13 +140,12 @@ task.on('each', {
 
 
 task.on('parse', function (dir, info) {
-    //this === task;
-
-    this.clear(); 
+    this.clear();
 
     Object.entries(info).forEach(function ([name, json]) {
         File.writeJSON(`${dir}/${name}.json`, json);
     });
+
 
     this.each('拷贝', function (file, dest) {
         fs.copyFileSync(file, dest);
@@ -197,12 +160,3 @@ task.on('parse', function (dir, info) {
 
 
 task.parse();
-
-```
-
-
-
-
-
-
-

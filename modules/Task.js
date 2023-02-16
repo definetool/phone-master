@@ -1,10 +1,10 @@
 
 require('colors');
 
+const fs = require('fs');
 const File = require('@definejs/file');
 const Directory = require('@definejs/directory');
 const Emitter = require('@definejs/emitter');
-const $String = require('@definejs/string');
 
 const Timer = require('../lib/Timer');
 
@@ -26,8 +26,12 @@ class Task {
     * 构造器。
     * @param {*} config 配置对象。
     * 已重载 Task(dir);
-    * 已重载 Task(config);
+    *   当传入一个字符串时，将作为一个目录对待，此时：
+    *   output.dir = `${dir}/output/`;
+    *   source.dir = `${dir}/source/`;
+    *   target.dir = `${dir}/target/`;
     * 
+    * 已重载 Task(config);
     *   config = {
     *       output: {
     *           dir: '',
@@ -44,8 +48,15 @@ class Task {
     * 
     *       target: {
     *           dir: '',
-    *           clear: false,
     *           overwrite: false,
+    *           main: {
+    *               fullExif: '',
+    *               noExif: '',
+    *           },
+    *           repeat: {
+    *               fullExif: '',
+    *               noExif: '',
+    *           },
     *           
     *       },
     *   };
@@ -62,25 +73,28 @@ class Task {
         mapper.set(this, meta);
     }
 
-
+    /**
+    * 绑定事件。
+    */
     on(...args) { 
         let meta = mapper.get(this);
         meta.emitter.on(...args);
     }
 
     /**
-    * 解析。
-    * 提取文件的 MD5 信息，保存到 cache 目录中。
+    * 解析源目录的文件，并提取相关信息。
+    * @param {function} done 可选，解析完成后要执行的回调函数。
+    *   如果不提供此函数，则会在解析完成后触发 (`parse`) 事件。
     */
-    parse() {
+    parse(done) {
         let meta = mapper.get(this);
-        let { console, source, target, } = meta;
+        let { console, source, target, output, } = meta;
         let timer = new Timer(console);
 
         timer.start(`开始分析 >>`.bold);
 
         let { files, exifs, } = Source.scan(console, source);
-        let { file$md5, md5$files, md5$main, mains, } = MD5.parse(console, files);
+        let { file$md5, md5$files, md5$main, main$files, mains, } = MD5.parse(console, files);
        
 
         Exif.extract(console, exifs, function (file$exif) {
@@ -91,6 +105,7 @@ class Task {
                 file$md5,
                 md5$files,
                 md5$main,
+                main$files,
                 mains,
                 exifs,
                 file$exif,
@@ -98,64 +113,98 @@ class Task {
             };
 
             Object.assign(meta.info, info);
-            File.writeJSON(meta.output.info, info);
 
             timer.stop(`<< 结束分析，耗时: {text}。`.bold);
 
-            meta.emitter.fire('parse', [info]);
+            if (done) {
+                done(output.dir, info);
+            }
+            else {
+                meta.emitter.fire('parse', [output.dir, info]);
+            }
 
 
         });
 
     }
 
+    /**
+    * 清空 output 目录和 target 目录中所有的子目录和文件。
+    */
     clear() { 
         let meta = mapper.get(this);
-        let { console, target, } = meta;
-        let { dir, } = target;
+        let { console, output, target, } = meta;
 
-        console.log(`清空目录:`.bgYellow, dir.red);
-        Directory.clear(dir);
+        console.log(`清空目录:`.bgYellow, output.dir.red);
+        Directory.clear(output.dir);
+
+        console.log(`清空目录:`.bgYellow, target.dir.red);
+        Directory.clear(target.dir);
     }
 
-    copy() {
+    /**
+    * 迭代处理每个子任务(文件)。
+    * @param {string} action 必选，要在进度条中显示的动作文本，如 `拷贝`、`移动`。
+    * @param {function} process 可选，针对每个子任务里的文件要进行处理的回调函数。
+    *   如果不提供此函数，则会触发 (`each`, `process`) 二级事件。
+    */
+    each(action, process) { 
         let meta = mapper.get(this);
-        let { console, info, target, } = meta;
-        let { tasks, } = info;
+        let { console, info, emitter, } = meta;
 
-        if (target.clear) {
-            this.clear();
-        }
+        Target.each(console, info.tasks, {
+            action,
 
+            fnDest: function (item, index) { 
+                return emitter.fire('each', 'dest', [item, index]);
+            },
 
-        Target.copy(console, tasks, function (item) { 
-            let { dest, sample, } = item;
-            let values = meta.emitter.fire('process', [item]);
-            let value = (values || []).slice(-1)[0]; //取最后一项。
-           
-
-            //大多数情况下是没有返回值，即 undefined，此时用回原来的。
-            if (value === undefined) {
-                return dest;
-            }
-
-            //外部的处理函数明确返回了 false，则跳过该文件。
-            if (value === false) {
-                return '';
-            }
-
-            if (typeof value == 'string') {
-                return value;
-            }
-
-            if (typeof value == 'object') {
-                return $String.format(sample, value);
-            }
-
-            throw new Error('无法识别的返回值：dest');
+            fnProcess: function (file, dest, item, index) { 
+                if (process) {
+                    process(file, dest, item, index);
+                }
+                else {
+                    emitter.fire('each', 'process', [file, dest, item, index]);
+                }
+            },
         });
-
     }
+
+
+    /**
+    * 输出(写入)解析到的中间信息到指定目录中。
+    * @param {string} dir 要输出的目录。
+    *   如果不指定，则输出到 output.dir 中。
+    */
+    output(dir) { 
+        let meta = mapper.get(this);
+        let { output, info, } = meta;
+
+        dir = dir || output.dir;
+
+        Object.entries(info).forEach(function ([name, json]) {
+            File.writeJSON(`${dir}/${name}.json`, json);
+        });
+    }
+
+    /**
+    * 使用复制(拷贝)的方式进行处理每个文件。
+    */
+    copy() { 
+        this.each('拷贝', function (file, dest) {
+            fs.copyFileSync(file, dest);
+        });
+    }
+
+    /**
+    * 使用重命名(移动)的方式进行处理每个文件。
+    */
+    rename() {
+        this.each('移动', function (file, dest) {
+            fs.renameSync(file, dest);
+        });
+    }
+
 
 
 }

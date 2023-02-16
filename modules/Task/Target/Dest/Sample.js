@@ -3,13 +3,13 @@
 module.exports = {
 
 
-    get(exif, { fullExif, dateExif, noExif, }) {
-        if (!exif) {
+    get(baseExif, { fullExif, dateExif, noExif, }) {
+        if (!baseExif) {
             return noExif;
         }
 
 
-        let sample = exif.model ? fullExif : dateExif;
+        let sample = baseExif.model ? fullExif : dateExif;
 
         sample = sample || noExif;
 

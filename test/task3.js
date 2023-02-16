@@ -1,14 +1,18 @@
 
-module.exports = {
-   
+const fs = require('fs');
+const { Task, Timer, fnDest, } = require('../index');
+
+
+let dir = '/Volumes/3/照片与视频/iPhone/Exports/2023-02-14@1719/';
+
+let config = {
     output: {
-        dir: `./output/`,
+        dir: `${dir}output/`,
         console: `console.log`,
     },
-  
-    source: {
-        dir: '',
 
+    source: {
+        dir: `${dir}source`,
         patterns: [
             '**/*',
         ],
@@ -26,12 +30,8 @@ module.exports = {
         ],
     },
 
-    
-
-   
-
     target: {
-        dir: '',
+        dir: `${dir}target/`,
 
         //是否覆盖目标文件。
         overwrite: false,
@@ -66,3 +66,30 @@ module.exports = {
         },
     },
 };
+
+let task = new Task(config);
+let timer = new Timer(task.console);
+
+timer.start(`开始任务 >>`.bold);
+
+
+task.on('each', {
+    'dest': fnDest,
+
+    // 'process': function (file, dest, item, index) { 
+    //     fs.copyFileSync(file, dest);
+    // },
+});
+
+
+task.on('parse', function (dir, info) {
+    this.clear();
+    this.output();
+    this.copy();
+    // this.rename();
+
+    timer.stop(`<< 结束任务，总耗时: {text}。`.bold);
+});
+
+
+task.parse();

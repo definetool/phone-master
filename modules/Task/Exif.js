@@ -22,15 +22,13 @@ module.exports = {
         tasker.on('each', function (file, index, done) {
             let link = index == maxIndex ? `└──` : `├──`;
 
-            Image.exif(file, function (exif) {
+            Image.exif(file, function (raw, base) {
                 bar.render({
                     text: '提取 exif: ',
                     msg: `${link}${file.cyan}`,
                 });
 
-                if (exif) {
-                    file$exif[file] = exif;
-                }
+                file$exif[file] = { raw, base, };
 
                 done();
             });

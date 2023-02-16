@@ -1,31 +1,35 @@
 
+const Directory = require('@definejs/directory');
 const File = require('@definejs/file');
-const Path = require('@definejs/path');
 
-module.exports = {
-    
-    copy({ file, dest, overwrite, link, }) {
+
+module.exports = exports = {
+
+    each({ file, dest, overwrite, link }, fnProcess) {
         let msgs = [];
 
-        dest = Path.normalize(dest);
-
+        
         if (File.exists(dest)) {
             if (overwrite) {
                 msgs.push(`├──从:${file.green}`);
                 msgs.push(`${link}到(覆盖):${dest.magenta}`);
-                File.copy(file, dest);
+                fnProcess();
             }
             else {
-                msgs.push(`${link}已存在(跳过):${dest.gray}`)
+                msgs.push(`${link}已存在(跳过):${dest.gray}`);
             }
         }
         else {
             msgs.push(`├──从:${file.green}`);
             msgs.push(`${link}到:${dest.yellow}`);
-            File.copy(file, dest);
+
+            Directory.create(dest); //确保目标目录级别的路径先存在。
+            fnProcess();
         }
 
         return msgs;
 
     },
+    
+
 };

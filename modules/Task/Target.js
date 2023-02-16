@@ -1,6 +1,7 @@
 
 
 const colors = require('colors');
+const Path = require('@definejs/path');
 
 const ProgressBar = require('../../lib/ProgressBar');
 const Timer = require('../../lib/Timer');
@@ -8,7 +9,7 @@ const Timer = require('../../lib/Timer');
 const Dest = require('./Target/Dest');
 const File = require('./Target/File');
 
-module.exports = {
+module.exports = exports = {
 
     parse({ target, files, file$md5, md5$main, file$exif, }) {
         let { dir, overwrite, } = target;
@@ -23,7 +24,7 @@ module.exports = {
 
             let md5 = file$md5[file];
             let main = md5$main[md5];
-            let exif = file$exif[file];
+            let exif = file$exif[file]; //可能为空。
             let samples = file == main ? target.main : target.repeat;
             let { dest, sample, date, year, month, day, ext, type, name, basename, } = Dest.get({ dir, file, exif, samples, });
 
@@ -39,38 +40,43 @@ module.exports = {
     },
 
 
-    copy(console, list, process) { 
+    each(console, list, { action, fnDest, fnProcess, }) {
         let bar = new ProgressBar(list, console);
         let timer = new Timer(console);
         let maxIndex = list.length - 1;
 
-        timer.start(`开始拷贝文件: 共 ${colors.cyan(list.length)} 个 >>`.bold);
+        timer.start(`开始${action}文件: 共 ${colors.cyan(list.length)} 个 >>`.bold);
 
         list.forEach((item, index) => {
             let { file, dest, overwrite, } = item;
             let link = index == maxIndex ? `└──` : `├──`;
+            let values = fnDest(item, index);
             let msgs = [];
 
-            dest = process(item, index);
+            dest = Dest.check(item, values);
 
             if (dest) {
-                msgs = File.copy({ file, dest, overwrite, link, });
+                dest = Path.normalize(dest);
+                msgs = File.each({ file, dest, overwrite, link, }, function () { 
+                    fnProcess(file, dest, item, index);
+                });
             }
             else {
                 msgs = [`${link}${'已忽略'.bgMagenta}: ${file.magenta}`,];
             }
-          
+
 
             bar.render({
                 'msg': msgs.join('\n'),
-                'text': '拷贝: ',
+                'text': `${action}: `,
             });
 
         });
 
-        timer.stop(`<< 结束拷贝文件，耗时: {text}。`.bold);
+        timer.stop(`<< 结束${action}文件，耗时: {text}。`.bold);
 
     },
+
 
 
 };

@@ -14,7 +14,7 @@ module.exports = {
                 target: `${dir}/target/`,
             };
         }
-        
+
        
         let { output, source, target, } = config;
 
@@ -40,7 +40,6 @@ module.exports = {
         if (output.dir) {
             output.dir = Path.normalizeDir(output.dir);
             output.console = Path.normalize(`${output.dir}${output.console}`);
-            output.info = Path.normalize(`${output.dir}${output.info}`);
         }
 
         source.dir = Path.normalizeDir(source.dir);

@@ -201,7 +201,9 @@ class Task {
     */
     rename() {
         this.each('移动', function (file, dest) {
-            fs.renameSync(file, dest);
+            if (file != dest) {
+                fs.renameSync(file, dest);
+            }
         });
     }
 

@@ -20,12 +20,16 @@ module.exports = exports = {
         
 
         let list = files.map((file) => {
+            //当不启用 Exif 分析时，file$exif 就为一个空对象 {}。
+            //当不启用 MD5 分析时，file$md5、md5$main 就为一个空对象 {}。
             //当 file == main 时则为主文件，否则为重复文件。
+            
+            let md5 = file$md5[file];   //可能不存在。
+            let main = md5 === undefined ? file : md5$main[md5];
 
-            let md5 = file$md5[file];
-            let main = md5$main[md5];
-            let exif = file$exif[file]; //可能为空。
+            let exif = file$exif[file]; //可能不存在。
             let samples = file == main ? target.main : target.repeat;
+
             let { dest, sample, date, year, month, day, ext, type, name, basename, } = Dest.get({ dir, file, exif, samples, });
 
             return {

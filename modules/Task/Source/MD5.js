@@ -3,8 +3,8 @@ const colors = require('colors');
 const MD5 = require('@definejs/md5');
 const $Array = require('@definejs/array');
 
-const ProgressBar = require('../../lib/ProgressBar');
-const Timer = require('../../lib/Timer');
+const ProgressBar = require('../../../lib/ProgressBar');
+const Timer = require('../../../lib/Timer');
 
 const Main = require('./MD5/Main');
 
@@ -12,16 +12,23 @@ const Main = require('./MD5/Main');
 
 module.exports = {
 
-    parse(console, files) {
-        let bar = new ProgressBar(files, console);
-        let timer = new Timer(console);
-        let maxIndex = files.length - 1;
-
+    parse(console, enabled, files) {
         let file$md5 = {};
         let md5$files = {};
         let md5$main = {}; 
         let main$files = {};    //主文件对应的 md5 相同的其它重复文件。
         let mains = [];         //所有的主文件。
+
+        //不启用。
+        if (!enabled) {
+            return { file$md5, md5$files, md5$main, main$files, mains, };
+        }
+
+
+
+        let bar = new ProgressBar(files, console);
+        let timer = new Timer(console);
+        let maxIndex = files.length - 1;
 
         timer.start(`开始计算 md5，共: ${colors.cyan(maxIndex + 1)} 个 >>`.bold);
 

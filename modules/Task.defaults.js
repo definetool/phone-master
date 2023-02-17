@@ -9,6 +9,9 @@ module.exports = {
     source: {
         dir: '',
 
+        //是否启用 md5 分析以查找出内容重复的文件。
+        md5: true,
+
         patterns: [
             '**/*',
         ],
@@ -19,7 +22,8 @@ module.exports = {
             // '**/*.HEIC',
         ],
 
-        //需要进行 exif 信息抽取的文件类型。 不区分大小写。
+        //需要进行 exif 信息抽取的文件类型，不区分大小写。
+        //如果指定为 false，则不进行提取，包括不显示界面。
         exifs: [
             '.jpg',
             '.jpeg',

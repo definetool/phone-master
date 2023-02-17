@@ -10,6 +10,13 @@ const Image = require('./Exif/Image');
 module.exports = {
 
     extract(console, files, fn) {
+        //此时禁用 Exif 提取，不显示界面。
+        if (!files) {
+            fn({});
+            return;
+        }
+
+
         let bar = new ProgressBar(files, console);
         let timer = new Timer(console);
 

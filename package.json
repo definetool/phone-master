@@ -1,6 +1,6 @@
 {
   "name": "@definetool/phone-master",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "手机导出的照片、视频和文件分类工具。",
   "main": "index.js",
   "scripts": {},
@@ -27,6 +27,7 @@
     "@webpart/console": "^2.1.0",
     "colors": "^1.4.0",
     "exif": "^0.6.0",
-    "progress": "^2.0.3"
+    "progress": "^2.0.3",
+    "utimes": "^5.1.1"
   }
 }

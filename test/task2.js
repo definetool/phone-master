@@ -141,8 +141,8 @@ task.on('each', {
 task.on('parse', function (dir, info) {
     this.clear();
     this.output();
-    this.copy();
-    // this.rename();
+    // this.copy();
+    this.rename();
 
 
     timer.stop(`<< 结束任务，总耗时: {text}。`.bold);

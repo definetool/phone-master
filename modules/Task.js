@@ -2,10 +2,12 @@
 require('colors');
 
 const fs = require('fs');
+
 const File = require('@definejs/file');
 const Directory = require('@definejs/directory');
 const Emitter = require('@definejs/emitter');
 
+const FileTime = require('../lib/FileTime');
 const Timer = require('../lib/Timer');
 
 const Source = require('./Task/Source');
@@ -76,7 +78,7 @@ class Task {
     /**
     * 绑定事件。
     */
-    on(...args) { 
+    on(...args) {
         let meta = mapper.get(this);
         meta.emitter.on(...args);
     }
@@ -95,7 +97,7 @@ class Task {
 
         let { files, exifs, } = Source.scan(console, source);
         let { file$md5, md5$files, md5$main, main$files, mains, } = MD5.parse(console, files);
-       
+
 
         Exif.extract(console, exifs, function (file$exif) {
             let tasks = Target.parse({ target, files, file$md5, md5$main, file$exif, });
@@ -131,7 +133,7 @@ class Task {
     /**
     * 清空 output 目录和 target 目录中所有的子目录和文件。
     */
-    clear() { 
+    clear() {
         let meta = mapper.get(this);
         let { console, output, target, } = meta;
 
@@ -148,18 +150,18 @@ class Task {
     * @param {function} process 可选，针对每个子任务里的文件要进行处理的回调函数。
     *   如果不提供此函数，则会触发 (`each`, `process`) 二级事件。
     */
-    each(action, process) { 
+    each(action, process) {
         let meta = mapper.get(this);
         let { console, info, emitter, } = meta;
 
         Target.each(console, info.tasks, {
             action,
 
-            fnDest: function (item, index) { 
+            fnDest: function (item, index) {
                 return emitter.fire('each', 'dest', [item, index]);
             },
 
-            fnProcess: function (file, dest, item, index) { 
+            fnProcess: function (file, dest, item, index) {
                 if (process) {
                     process(file, dest, item, index);
                 }
@@ -176,7 +178,7 @@ class Task {
     * @param {string} dir 要输出的目录。
     *   如果不指定，则输出到 output.dir 中。
     */
-    output(dir) { 
+    output(dir) {
         let meta = mapper.get(this);
         let { output, info, } = meta;
 
@@ -188,21 +190,28 @@ class Task {
     }
 
     /**
-    * 使用复制(拷贝)的方式进行处理每个文件。
+    * 使用复制(拷贝)的方式处理每个文件。
+    * 会把原文件的时间属性也拷贝到目标文件。
     */
-    copy() { 
+    copy() {
         this.each('拷贝', function (file, dest) {
+            let stat = fs.statSync(file);
             fs.copyFileSync(file, dest);
+            FileTime.copy(stat, dest); //把原文件的时间属性也拷贝到目标文件。
+            
         });
     }
 
     /**
-    * 使用重命名(移动)的方式进行处理每个文件。
+    * 使用重命名(移动)的方式处理每个文件。
+    * 会把原文件的时间属性也拷贝到目标文件。
     */
     rename() {
         this.each('移动', function (file, dest) {
             if (file != dest) {
+                let stat = fs.statSync(file);
                 fs.renameSync(file, dest);
+                FileTime.copy(stat, dest); //把原文件的时间属性也拷贝到目标文件。
             }
         });
     }

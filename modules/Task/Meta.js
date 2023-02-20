@@ -38,13 +38,16 @@ module.exports = {
         config = { ...defaults, ...config, output, source, target, };
 
         if (output.dir) {
+            output.dir = Path.resolve(output.dir);
             output.dir = Path.normalizeDir(output.dir);
             output.console = Path.normalize(`${output.dir}${output.console}`);
         }
 
+        source.dir = Path.resolve(source.dir);
         source.dir = Path.normalizeDir(source.dir);
 
         if (target.dir) {
+            target.dir = Path.resolve(target.dir);
             target.dir = Path.normalizeDir(target.dir);
         }
         

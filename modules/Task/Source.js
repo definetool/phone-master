@@ -5,17 +5,17 @@ const Patterns = require('@definejs/patterns');
 
 const Timer = require('../../lib/Timer');
 const Exifs = require('./Source/Exifs');
-const MD5 = require('./Source/MD5');
+const Hash = require('./Source/Hash');
 
 module.exports = {
 
     parse(console, source) {
-        let { dir, patterns, excludes, exifs, md5, } = source;
+        let { dir, patterns, exifs, hash, } = source;
         let timer = new Timer(console);
 
         timer.start(`${'开始扫描目录'.bold} ${dir.blue} >>`.bold);
 
-        let files = Patterns.getFiles(dir, patterns, excludes);
+        let files = Patterns.getFiles(dir, patterns);
 
         timer.stop(`<< 结束扫描，共找到 ${colors.cyan(files.length)} 个文件，耗时{text}。`.bold);
 
@@ -25,10 +25,10 @@ module.exports = {
         exifs = Exifs.filter(files, exifs);
 
 
-        let { file$md5, md5$files, md5$main, main$files, mains, } = MD5.parse(console, md5, files);
+        let { file$hash, hash$files, hash$main, main$files, mains, } = Hash.parse(console, hash, files);
 
 
-        return { files, exifs, file$md5, md5$files, md5$main, main$files, mains, };
+        return { files, exifs, file$hash, hash$files, hash$main, main$files, mains, };
     },
 
 

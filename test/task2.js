@@ -76,7 +76,7 @@ timer.start(`开始任务 >>`.bold);
 task.on('each', {
     'dest': function (item, index) {
         let {
-            dir, overwrite, file, md5, main, exif,
+            dir, overwrite, file, hash, main, exif,
             dest, sample, date, year, month, day, ext, type, name, basename,
         } = item;
 

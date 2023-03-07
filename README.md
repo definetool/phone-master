@@ -51,8 +51,8 @@ let config = {
     source: {
         dir: `${dir}source`,
 
-        //是否启用 md5 分析以查找出内容重复的文件。
-        md5: true,
+        //是否启用 hash 分析以查找出内容重复的文件。
+        hash: true,
 
         patterns: [
             '**/*',
@@ -118,7 +118,7 @@ timer.start(`开始任务 >>`.bold);
 task.on('each', {
     'dest': function (item, index) {
         let {
-            dir, overwrite, file, md5, main, exif,
+            dir, overwrite, file, hash, main, exif,
             dest, sample, date, year, month, day, ext, type, name, basename,
         } = item;
 

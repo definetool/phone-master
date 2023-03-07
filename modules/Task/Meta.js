@@ -65,9 +65,9 @@ module.exports = {
             info: {
                 files: [],      //source 目录扫描出来的符合条件的文件列表。
 
-                file$md5: {},   //
-                md5$files: {},  //
-                md5$main: {},   //
+                file$hash: {},   //
+                hash$files: {},  //
+                hash$main: {},   //
                 mains: [],      //
 
                 exifs: [],  //

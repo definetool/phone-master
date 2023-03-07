@@ -1,27 +1,29 @@
 
 const colors = require('colors');
+const fs = require('fs');
 const MD5 = require('@definejs/md5');
 const $Array = require('@definejs/array');
 
 const ProgressBar = require('../../../lib/ProgressBar');
 const Timer = require('../../../lib/Timer');
+const Size = require('../../../lib/Size');
 
-const Main = require('./MD5/Main');
+const Main = require('./Hash/Main');
 
 
 
 module.exports = {
 
     parse(console, enabled, files) {
-        let file$md5 = {};
-        let md5$files = {};
-        let md5$main = {}; 
-        let main$files = {};    //主文件对应的 md5 相同的其它重复文件。
+        let file$hash = {};
+        let hash$files = {};
+        let hash$main = {}; 
+        let main$files = {};    //主文件对应的 hash 相同的其它重复文件。
         let mains = [];         //所有的主文件。
 
         //不启用。
         if (!enabled) {
-            return { file$md5, md5$files, md5$main, main$files, mains, };
+            return { file$hash, hash$files, hash$main, main$files, mains, };
         }
 
 
@@ -30,25 +32,29 @@ module.exports = {
         let timer = new Timer(console);
         let maxIndex = files.length - 1;
 
-        timer.start(`开始计算 md5，共: ${colors.cyan(maxIndex + 1)} 个 >>`.bold);
+        timer.start(`开始计算哈希: ${colors.cyan(maxIndex + 1)} 个 >>`.bold);
 
         files.forEach((file, index) => {
             let link = index == maxIndex ? `└──` : `├──`;
-            let md5 = MD5.read(file);
+            let hash = MD5.read(file);
+            let stat = fs.statSync(file);
+            let size = Size.getDesc(stat.size);
 
-            $Array.add(md5$files, md5, file);
-            file$md5[file] = md5;
+
+            $Array.add(hash$files, hash, file);
+            file$hash[file] = hash;
+
 
             bar.render({
-                'text': '计算 md5: ',
-                'msg': `${link}${md5}:${file.cyan}`,
+                text: `计算哈希: `,
+                msg: `${link.gray}${hash.cyan} ${file.grey} ${'|'.cyan} ${size.value.magenta}${size.desc}`,
             });
             
         });
 
 
-        Object.entries(md5$files).forEach(([md5, files]) => {
-            let main = md5$main[md5] = Main.get(files);
+        Object.entries(hash$files).forEach(([hash, files]) => {
+            let main = hash$main[hash] = Main.get(files);
             
             //找出重复的文件。
             files = files.filter((file) => {
@@ -63,9 +69,9 @@ module.exports = {
 
 
         return {
-            file$md5,
-            md5$files,
-            md5$main,
+            file$hash,
+            hash$files,
+            hash$main,
             main$files,
             mains,
         };

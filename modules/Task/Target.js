@@ -11,7 +11,7 @@ const File = require('./Target/File');
 
 module.exports = exports = {
 
-    parse({ target, files, file$md5, md5$main, file$exif, }) {
+    parse({ target, files, file$hash, hash$main, file$exif, }) {
         let { dir, overwrite, } = target;
         
         if (!dir) {
@@ -24,8 +24,8 @@ module.exports = exports = {
             //当不启用 MD5 分析时，file$md5、md5$main 就为一个空对象 {}。
             //当 file == main 时则为主文件，否则为重复文件。
             
-            let md5 = file$md5[file];   //可能不存在。
-            let main = md5 === undefined ? file : md5$main[md5];
+            let hash = file$hash[file];   //可能不存在。
+            let main = hash === undefined ? file : hash$main[hash];
 
             let exif = file$exif[file]; //可能不存在。
             let samples = file == main ? target.main : target.repeat;
@@ -33,7 +33,7 @@ module.exports = exports = {
             let { dest, sample, date, year, month, day, ext, type, name, basename, } = Dest.get({ dir, file, exif, samples, });
 
             return {
-                dir, overwrite, file, md5, main, exif,
+                dir, overwrite, file, hash, main, exif,
                 dest, sample, date, year, month, day, ext, type, name, basename, 
             };
 

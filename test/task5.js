@@ -11,7 +11,7 @@ let config = {
 
     source: {
         dir: `${dir}source/`,
-        md5: false,
+        hash: false,
         // exifs: false,
     },
 

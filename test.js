@@ -1,56 +1,28 @@
-const Timer = require('./lib/Timer');
-const Task = require('./modules/Task');
 
 
-module.exports = exports = {
-    Timer,
-    Task,
 
-    copy(config, fnDest = exports.fnDest) {
-        let task = new Task(config);
-        let timer = new Timer(task.console);
+// start('/Volumes/3/照片与视频/iPhone/Exports/2023-02-28@1106');
+start('/Volumes/3/照片与视频/iPhone/Exports/2023-03-07@1149');
 
-        timer.start(`开始任务 >>`.bold);
 
-        task.on('each', {
-            'dest': fnDest,
-        });
 
-        task.on('parse', function (dir, info) {
-            this.clear();
-            this.output();
-            this.copy();
 
-            timer.stop(`<< 结束任务，总耗时: {text}。`.bold);
-        });
 
-        task.parse();
-    },
 
-    rename(config, fnDest = exports.fnDest) {
-        let task = new Task(config);
-        let timer = new Timer(task.console);
 
-        timer.start(`开始任务 >>`.bold);
+//------------------------------------------------------------------------
 
-        task.on('each', {
-            'dest': fnDest,
-        });
+function start(dir) {
+    const { Timer, Task, } = require('./index');
 
-        task.on('parse', function (dir, info) {
-            this.clear();
-            this.output();
-            this.rename();
+    let task = new Task(dir);
+    let timer = new Timer(task.console);
 
-            timer.stop(`<< 结束任务，总耗时: {text}。`.bold);
-        });
+   
 
-        task.parse();
-    },
+    timer.start(`开始任务 >>`.bold);
 
-    //提供一个默认的自定义路由。
-    //用户可以自定义一个新的。
-    fnDest(item, index) {
+    task.on('each', 'dest', function (item, index) {
         let {
             dir, overwrite, file, hash, main, exif,
             dest, sample, date, year, month, day, ext, type, name, basename,
@@ -59,7 +31,7 @@ module.exports = exports = {
         ext = ext.toLowerCase();
 
         //返回 false 可以忽略该文件。
-        if (ext == '.ini') {
+        if (ext == '.aae' || ext == '.ini' || ext == '.db') {
             return false;
         }
 
@@ -106,10 +78,20 @@ module.exports = exports = {
             return `${dir}/${file == main ? '' : 'repeat'}/${router}/${date}/${name}`;
         }
 
-    },
-
-};
+    });
 
 
+    task.on('parse', function (dir, info) {
+        this.output();
+
+        // this.copy();        //采用复制的方式。
+        // this.rename();   //采用移动的方式。
+
+        timer.stop(`<< 结束任务，总耗时: {text}。`.bold);
+    });
 
 
+    task.clear();
+    task.parse();
+
+}

@@ -42,7 +42,7 @@ class Task {
     *       
     *       source: {
     *           dir: '',
-    *           md5: true,
+    *           hash: true,
     *           patterns: [],
     *           excludes: [],
     *           exifs: [],
@@ -73,6 +73,8 @@ class Task {
         meta.emitter = emitter;
 
         mapper.set(this, meta);
+
+        this.meta = meta;
     }
 
     /**
@@ -95,16 +97,16 @@ class Task {
 
         timer.start(`开始分析 >>`.bold);
 
-        let { files, exifs, file$md5, md5$files, md5$main, main$files, mains, } = Source.parse(console, source);
+        let { files, exifs, file$hash, hash$files, hash$main, main$files, mains, } = Source.parse(console, source);
 
         Exif.extract(console, exifs, function (file$exif) {
-            let tasks = Target.parse({ target, files, file$md5, md5$main, file$exif, });
+            let tasks = Target.parse({ target, files, file$hash, hash$main, file$exif, });
 
             let info = {
                 files,      //
-                file$md5,   //当不启用 MD5 分析时，则为一个空的 {}。
-                md5$files,  //当不启用 MD5 分析时，则为一个空的 {}。
-                md5$main,   //当不启用 MD5 分析时，则为一个空的 {}。
+                file$hash,   //当不启用 MD5 分析时，则为一个空的 {}。
+                hash$files,  //当不启用 MD5 分析时，则为一个空的 {}。
+                hash$main,   //当不启用 MD5 分析时，则为一个空的 {}。
                 main$files, //当不启用 MD5 分析时，则为一个空的 {}。
                 mains,      //当不启用 MD5 分析时，则为一个空的 []。
                 exifs,      //当不启用 Exif 提取时，则为 false。

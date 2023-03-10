@@ -17,13 +17,13 @@ module.exports = exports = {
         });
 
         task.on('parse', function (dir, info) {
-            this.clear();
-            this.output();
-            this.copy();
+            task.output();
+            task.copy();
 
             timer.stop(`<< 结束任务，总耗时: {text}。`.bold);
         });
 
+        task.clear();
         task.parse();
     },
 
@@ -38,13 +38,13 @@ module.exports = exports = {
         });
 
         task.on('parse', function (dir, info) {
-            this.clear();
-            this.output();
-            this.rename();
+            task.output();
+            task.rename();
 
             timer.stop(`<< 结束任务，总耗时: {text}。`.bold);
         });
 
+        task.clear();
         task.parse();
     },
 

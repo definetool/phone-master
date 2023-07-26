@@ -12,7 +12,7 @@ const File = require('./Target/File');
 module.exports = exports = {
 
     parse({ target, files, file$hash, hash$main, file$exif, }) {
-        let { dir, overwrite, } = target;
+        let { dir, overwrite, timeKey, } = target;
         
         if (!dir) {
             return;
@@ -30,11 +30,19 @@ module.exports = exports = {
             let exif = file$exif[file]; //可能不存在。
             let samples = file == main ? target.main : target.repeat;
 
-            let { dest, sample, date, year, month, day, ext, type, name, basename, } = Dest.get({ dir, file, exif, samples, });
+            let {
+                dest, sample,
+                make, model,
+                date, year, month, day,
+                ext, type, name, basename,
+            } = Dest.get({ dir, file, exif, samples, timeKey, });
 
             return {
                 dir, overwrite, file, hash, main, exif,
-                dest, sample, date, year, month, day, ext, type, name, basename, 
+                dest, sample,
+                make, model,
+                date, year, month, day,
+                ext, type, name, basename, 
             };
 
         });

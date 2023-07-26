@@ -9,35 +9,30 @@ const Time = require('./Dest/Time');
 module.exports = {
 
 
-    get({ dir, file, exif, samples, }) {
+    get({ dir, file, exif, samples, timeKey, }) {
         let baseExif = exif ? exif.base : null;
         let { make, model, datetime, } = baseExif || {};
 
         let sample = Sample.get(baseExif, samples);
-        let { date, year, month, day, } = Time.get(baseExif, file);
+        let { date, year, month, day, } = Time.get(baseExif, file, timeKey);
         let { ext, type, name, basename, } = Path.get(file);
 
         let dest = $String.format(sample, {
             dir,
-
-            make,
-            model,
-
-            date,
-            year,
-            month,
-            day,
-
-            name,
-            basename,
-            ext,
-            type,
+            make, model,
+            date, year, month, day,
+            ext, type, name, basename,
         });
 
         dest = $Path.normalize(dest);
 
 
-        return { dest, sample, date, year, month, day, ext, type, name, basename, };
+        return {
+            dest, sample,
+            make, model,
+            date, year, month, day,
+            ext, type, name, basename,
+        };
     },
 
     check(item, values) { 

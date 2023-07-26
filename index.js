@@ -31,6 +31,7 @@ module.exports = exports = {
         let task = new Task(config);
         let timer = new Timer(task.console);
 
+
         timer.start(`开始任务 >>`.bold);
 
         task.on('each', {
@@ -72,6 +73,10 @@ module.exports = exports = {
             //如 `VIDEO_20230125_101152.mp4`
             if (name.startsWith('VIDEO_') && ext == '.mp4') {
                 return `摄像头`;
+            }
+
+            if (name.endsWith('_timelapse_video.mp4')) {
+                return `摄像头/延时拍摄`;
             }
 
             //如 `RPReplay_Final1674383698.mp4`

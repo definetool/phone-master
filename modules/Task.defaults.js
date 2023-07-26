@@ -21,7 +21,8 @@ module.exports = {
             '!**/desktop.ini',
             '!**/Desktop.ini',
             '!**/thumbs.db',
-            '!**/Thumbs.db', 
+            '!**/Thumbs.db',
+            '!**/*.xmp', 
         ],
 
 
@@ -42,6 +43,10 @@ module.exports = {
 
         //是否覆盖目标文件。
         overwrite: false,
+
+        //优先使用 exif 中的日期。
+        //如果没有，再使用文件的日期，此时可以指定要使用文件属性中的哪个时间字段。 
+        timeKey: 'birthtimeMs', //`birthtimeMs` | `mtimeMs`
 
         main: {
             //可以提取出完整 exif 信息的照片的输出路径。

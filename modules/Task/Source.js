@@ -28,7 +28,10 @@ module.exports = {
         let { file$hash, hash$files, hash$main, main$files, mains, } = Hash.parse(console, hash, files);
 
 
-        return { files, exifs, file$hash, hash$files, hash$main, main$files, mains, };
+        return {
+            files, exifs,
+            file$hash, hash$files, hash$main, main$files, mains,
+        };
     },
 
 

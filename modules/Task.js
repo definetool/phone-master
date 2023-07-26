@@ -20,6 +20,7 @@ const Meta = require('./Task/Meta');
 
 
 
+
 let mapper = new Map();
 
 class Task {
@@ -51,6 +52,7 @@ class Task {
     *       target: {
     *           dir: '',
     *           overwrite: false,
+    *           timeKey: 'birthtime',
     *           main: {
     *               fullExif: '',
     *               noExif: '',
@@ -97,7 +99,10 @@ class Task {
 
         timer.start(`开始分析 >>`.bold);
 
-        let { files, exifs, file$hash, hash$files, hash$main, main$files, mains, } = Source.parse(console, source);
+        let {
+            files, exifs,
+            file$hash, hash$files, hash$main, main$files, mains,
+        } = Source.parse(console, source);
 
         Exif.extract(console, exifs, function (file$exif) {
             let tasks = Target.parse({ target, files, file$hash, hash$main, file$exif, });
@@ -194,8 +199,8 @@ class Task {
     * 会把原文件的时间属性也拷贝到目标文件。
     */
     copy() {
-        this.each('拷贝', function (file, dest) {
-            let stat = fs.statSync(file);
+        this.each('拷贝', function (file, dest, item, index) {
+            let stat = FileTime.read(file, item.exif);
             fs.copyFileSync(file, dest);
             FileTime.copy(stat, dest); //把原文件的时间属性也拷贝到目标文件。
             
@@ -207,12 +212,14 @@ class Task {
     * 会把原文件的时间属性也拷贝到目标文件。
     */
     rename() {
-        this.each('移动', function (file, dest) {
-            if (file != dest) {
-                let stat = fs.statSync(file);
-                fs.renameSync(file, dest);
-                FileTime.copy(stat, dest); //把原文件的时间属性也拷贝到目标文件。
+        this.each('移动', function (file, dest, item, index) {
+            if (file == dest) {
+                return;
             }
+
+            let stat = FileTime.read(file, item.exif);
+            fs.renameSync(file, dest);
+            FileTime.copy(stat, dest); //把原文件的时间属性也拷贝到目标文件。
         });
     }
 
